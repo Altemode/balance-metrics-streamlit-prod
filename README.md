@@ -1,4 +1,5 @@
-# balance-metrics-streamlit-prod
+# Balance Metrics Streamlit!
+
 
 Measure the balance of a person from using a force platform with sensors!
 
@@ -11,6 +12,9 @@ It has been used python code and many libraries such as pandas, numpy, streamlit
 
 - Prepare File: First the user is able to view the raw data into chart and edit it depending on their needs!
 
-- Insert User : The user may insert new user in the database..Also if the user exists, there is the posibility to import the fields automtically.
+- Insert New Entry : The user may insert new user in the database..Also if the user exists, there is the posibility to import the fields automtically.
 
-- 
+- Center of Pressure : Calculate the ballance results for each entry of the dataframe table.
+
+Streamlit Cloud Url : https://balance.streamlit.app
+
