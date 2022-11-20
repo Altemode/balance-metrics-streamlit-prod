@@ -125,28 +125,28 @@ if uploaded_file:
         
 
 
-        col1, col2 = st.columns(2, gap='small')
+        col1, col2 = st.columns(2, gap='large')
         with col1:
-            avg1 = st.number_input("give avg1")
+            avg1 = st.number_input("Give kg to abstract from the data for Sensor A")
             df_prepared['Mass_1'] = df_prepared['Mass_1'] - avg1
-            fig1 = px.line(df_prepared, x="Rows_Count", y="Mass_1", title='Life expectancy in Canada')
+            fig1 = px.line(df_prepared, x="Rows_Count", y="Mass_1", title='Sensor A')
             st.plotly_chart(fig1, use_container_width=True)
             
-            avg2 = st.number_input("give avg2")
+            avg2 = st.number_input("Give kg to abstract from the data for Sensor B")
             df_prepared['Mass_2'] = df_prepared['Mass_2'] - avg2
-            fig2 = px.line(df_prepared, x="Rows_Count", y="Mass_2", title='Life expectancy in Canada')
+            fig2 = px.line(df_prepared, x="Rows_Count", y="Mass_2", title='Sensor B')
             st.plotly_chart(fig2, use_container_width=True)
             
 
         with col2:
-            avg3 = st.number_input("give avg3")
+            avg3 = st.number_input("Give kg to abstract from the data for Sensor C")
             df_prepared['Mass_3'] = df_prepared['Mass_3'] - avg3
-            fig3 = px.line(df_prepared, x="Rows_Count", y="Mass_3", title='Life expectancy in Canada')
+            fig3 = px.line(df_prepared, x="Rows_Count", y="Mass_3", title='Sensor C')
             st.plotly_chart(fig3, use_container_width=True)
 
-            avg4 = st.number_input("give avg4")
+            avg4 = st.number_input("Give kg to abstract from the data for Sensor D")
             df_prepared['Mass_4'] = df_prepared['Mass_4'] - avg4
-            fig4 = px.line(df_prepared, x="Rows_Count", y="Mass_4", title='Life expectancy in Canada')
+            fig4 = px.line(df_prepared, x="Rows_Count", y="Mass_4", title='Sensor D')
             st.plotly_chart(fig4, use_container_width=True)
 
 
