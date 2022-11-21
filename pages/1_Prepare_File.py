@@ -32,7 +32,7 @@ st.title('Prepare the file')
 
 with st.expander("Show File Form", expanded=True):
     uploaded_file = st.file_uploader("Choose a file")
-platform_mass = st.number_input("Give the platfrom mass:")
+#platform_mass = st.number_input("Give the platfrom mass:")
 #@st.cache(allow_output_mutation=True)
 #@st.experimental_singleton
 @st.cache  # No need for TTL this time. It's static data :)
@@ -60,8 +60,17 @@ def get_data():
         Vfs_4 = 2.00024
         df_raw_data['Mass_4'] = df_raw_data['Mass_4'] * C / (Vfs_4 * ( (2**resolution) - 1 ) )
         # Calculate the sum of all sensors Mass $ Weight
-        df_raw_data['Mass_Sum'] = (df_raw_data['Mass_1'] + df_raw_data['Mass_2'] + df_raw_data['Mass_3'] + df_raw_data['Mass_4']) - platform_mass
+        df_raw_data['Mass_Sum'] = (df_raw_data['Mass_1'] + df_raw_data['Mass_2'] + df_raw_data['Mass_3'] + df_raw_data['Mass_4'])
         df_raw_data['Rows_Count'] = df_raw_data.index
+        mean_weight_A = df_raw_data.loc[0:500, 'Mass_1'].mean()
+        mean_weight_B = df_raw_data.loc[0:500, 'Mass_2'].mean()
+        mean_weight_C = df_raw_data.loc[0:500, 'Mass_3'].mean()
+        mean_weight_D = df_raw_data.loc[0:500, 'Mass_4'].mean()
+        df_raw_data['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
+        df_raw_data['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
+        df_raw_data['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
+        df_raw_data['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
+
         return df_raw_data
 
 if uploaded_file:
@@ -71,116 +80,100 @@ if uploaded_file:
     # if st.button('Reload Dataframe with Raw Data'):
     #     get_data()
     if df_raw_data is not None:
+        #df_prepared = df_raw_data.copy()
         min_time = int(df_raw_data.index.min())
         max_time = int(df_raw_data.index.max())
-        selected_time_range = st.slider('Select the whole time range of the graph, per 1000', min_time, max_time, (min_time, max_time), 1)
-        selected_area = (df_raw_data.Rows_Count.between(selected_time_range[0], selected_time_range[1]) )
-        df_prepared = pd.DataFrame(df_raw_data[selected_area])
-        # @st.cache(suppress_st_warning=True)        
-        # def create_charts():
-        #     st.line_chart(df_prepared['Mass_1'])
-        #     st.line_chart(df_prepared['Mass_2'])
-        #     #st.line_chart(df_prepared['Mass_3'])
-        #     #st.line_chart(df_prepared['Mass_4'])
-        #     return
+        
+        with st.form("Give the numbers"):
+            col1,col2 = st.columns(2)
+            st.write("Give duration")
+            with col1:
+                from_time = st.number_input("Give the first time")
+            with col2:
+                till_time = st.number_input("Give the second time")
+            
+            
+            selected_time_range = st.slider('Select the whole time range of the graph, per 1000', min_time, max_time, (min_time, max_time), 1)
+            selected_area = (df_raw_data.Rows_Count.between(selected_time_range[0], selected_time_range[1]) )
 
+            submitted = st.form_submit_button("Calculate")
 
-        # get_charts = create_charts()
-        # st.write(get_charts)
+            if submitted :
+                mean_weight_A = df_raw_data.loc[from_time:till_time, 'Mass_1'].mean()
+                mean_weight_B = df_raw_data.loc[from_time:till_time, 'Mass_2'].mean()
+                mean_weight_C = df_raw_data.loc[from_time:till_time, 'Mass_3'].mean()
+                mean_weight_D = df_raw_data.loc[from_time:till_time, 'Mass_4'].mean()
+                df_prepared = df_raw_data.copy()
+                df_prepared['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
+                df_prepared['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
+                df_prepared['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
+                df_prepared['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
+                df_prepared = pd.DataFrame(df_raw_data[selected_area])
 
-        #@st.cache(hash_funcs={dict: lambda _: None}) # hash_funcs because dict can't be hashed
-        #def make_charts():       
-        # fig1 = px.line(df_prepared, y="Mass_1")   
-        # fig1.update_layout(
-        #     margin=dict(l=10, r=10, t=10, b=60),
-        #     #paper_bgcolor="LightSteelBlue",
-        # )      
-        # fig2 = px.line(df_prepared, y="Mass_2")   
-        # fig2.update_layout(
-        #     margin=dict(l=10, r=10, t=10, b=60),
-        #     #paper_bgcolor="LightSteelBlue",
-        # )      
-        # fig3 = px.line(df_prepared, y="Mass_3")   
-        # fig3.update_layout(
-        #     margin=dict(l=10, r=10, t=10, b=60),
-        #     #paper_bgcolor="LightSteelBlue",
-        # )      
-        # fig4 = px.line(df_prepared, y="Mass_4")   
-        # fig4.update_layout(
-        #     margin=dict(l=10, r=10, t=10, b=60),
-        #     #paper_bgcolor="LightSteelBlue",
-        # )         
-            #return fig1, fig2, fig3, fig4
+                #df_prepared = pd.DataFrame(df_prepared[selected_area]) 
+            
+            # Slider 
+           
 
-        #fig1, fig2, fig3, fig4 = make_charts()
-
-        # col1, col2 = st.columns(2, gap='small')
-        # with col1:
-        #     st.write(fig1)
-        #     st.write(fig2)
-        # with col2:
-        #     st.write(fig3)
-        #     st.write(fig4)
-
+            # Sliders
+        
         
 
-
-        col1, col2 = st.columns(2, gap='large')
-        with col1:
-            avg1 = st.number_input("Give kg to abstract from the data for Sensor A")
-            df_prepared['Mass_1'] = df_prepared['Mass_1'] - avg1
+    col1, col2 = st.columns(2, gap='large')
+    with col1:
+        ### CHART A ###
+        if submitted:
             fig1 = px.line(df_prepared, x="Rows_Count", y="Mass_1", title='Sensor A')
             st.plotly_chart(fig1, use_container_width=True)
-            
-            avg2 = st.number_input("Give kg to abstract from the data for Sensor B")
-            df_prepared['Mass_2'] = df_prepared['Mass_2'] - avg2
-            fig2 = px.line(df_prepared, x="Rows_Count", y="Mass_2", title='Sensor B')
-            st.plotly_chart(fig2, use_container_width=True)
-            
+        else:
+            fig1 = px.line(df_raw_data, x="Rows_Count", y="Mass_1", title='Sensor A')
+            st.plotly_chart(fig1, use_container_width=True)
 
-        with col2:
-            avg3 = st.number_input("Give kg to abstract from the data for Sensor C")
-            df_prepared['Mass_3'] = df_prepared['Mass_3'] - avg3
+
+        #### CHART C ####
+        if submitted:
             fig3 = px.line(df_prepared, x="Rows_Count", y="Mass_3", title='Sensor C')
             st.plotly_chart(fig3, use_container_width=True)
+        else:
+            fig3 = px.line(df_raw_data, x="Rows_Count", y="Mass_3", title='Sensor C')
+            st.plotly_chart(fig3, use_container_width=True)            
+        
+    with col2:
+        ### CHART B ####
+        if submitted:
+            fig2 = px.line(df_prepared, x="Rows_Count", y="Mass_2", title='Sensor B')
+            st.plotly_chart(fig2, use_container_width=True)
+        else:
+            fig2 = px.line(df_raw_data, x="Rows_Count", y="Mass_2", title='Sensor B')
+            st.plotly_chart(fig2, use_container_width=True) 
 
-            avg4 = st.number_input("Give kg to abstract from the data for Sensor D")
-            df_prepared['Mass_4'] = df_prepared['Mass_4'] - avg4
+
+        ### CHART D ####
+        if submitted:
             fig4 = px.line(df_prepared, x="Rows_Count", y="Mass_4", title='Sensor D')
+            st.plotly_chart(fig2, use_container_width=True)
+        else:
+            fig4 = px.line(df_raw_data, x="Rows_Count", y="Mass_4", title='Sensor D')
             st.plotly_chart(fig4, use_container_width=True)
 
+        if submitted :
 
-
-
-
-        # To Drop the unnecessary Columns
-        df_prepared.drop(['Rows_Count'], axis = 1, inplace=True)
-        filename = uploaded_file.name
-        # To Get only the filename without extension (.txt)
-        final_filename = os.path.splitext(filename)[0]
-        st.write("The file name of your file is : ", final_filename)
-        show_df_prepared = st.checkbox("Display the final dataframe")
-        if show_df_prepared:
+            # To Drop the unnecessary Columns
+            df_prepared.drop(['Rows_Count'], axis = 1, inplace=True)
+            filename = uploaded_file.name
+            # To Get only the filename without extension (.txt)
+            final_filename = os.path.splitext(filename)[0]
+            st.write("The file name of your file is : ", final_filename)
+            show_df_prepared = st.checkbox("Display the final dataframe")
             st.dataframe(df_prepared)
-        # if platform_mass >1:
-        #     st.download_button(
-        #         label="Export File",
-        #         data=df_prepared.to_csv(index=False),
-        #         file_name=final_filename +'.csv',
-        #         mime='text/csv',
-        #     )
+            st.download_button(
+                label="Export File",
+                data=df_prepared.to_csv(index=False),
+                file_name=final_filename +'.csv',
+                mime='text/csv',
+            )
+            
 
 
-        export = st.checkbox('Verify you have insert proper Platform Mass Value:')
-
-        if export:
-            if 0 <= platform_mass <= 7.5:
-                st.success("You are able to export your data.")
-                st.download_button(
-                    label="Export File",
-                    data=df_prepared.to_csv(index=False),
-                    file_name=final_filename +'.csv',
-                    mime='text/csv',
-                )
-            else:
-                st.warning("Please give correct platform mass!")
+                
+                
