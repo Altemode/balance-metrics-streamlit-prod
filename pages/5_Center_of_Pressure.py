@@ -134,8 +134,8 @@ def get_data():
         df = pd.read_csv(url_list[0]['filepath'].replace(" ", "%20"), storage_options=storage_options)
         W = 450
         L = 450
-        df['ML'] = (W / 2) * (( df['Mass_2'] + df['Mass_3'] - df['Mass_1'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] )
-        df['AP'] = (L / 2) * (( df['Mass_2'] + df['Mass_1'] - df['Mass_3'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] )
+        df['ML'] = ( (W / 2) * (( df['Mass_2'] + df['Mass_3'] - df['Mass_1'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] ) ) /10
+        df['AP'] = ( (L / 2) * (( df['Mass_2'] + df['Mass_1'] - df['Mass_3'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] ) ) /10
         
         df['Rows_Count'] = df.index
         N = len(df)
@@ -165,65 +165,60 @@ if url_list:
    
     #@st.cache  # No need for TTL this time. It's static data :)
     def make_charts():       
-        fig = px.scatter(df, x="Xn", y="Yn", opacity= 0.4)
-        fig.update_traces(marker={'size': 1})
-        fig.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
+        fig1 = px.scatter(df, x="Xn", y="Yn", opacity= 0.4)
+        fig1.update_traces(marker={'size': 1})
+        fig1.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
                         marker_symbol = 'circle', name="Zero Point" ,marker_color='red',
                         marker_size = 5))
-        fig.update_layout(
+        fig1.update_layout(
+            yaxis=dict(
+                range=[-8, 8]
+            ),
+            xaxis=dict(
+                range=[-8, 8]
+            ),
              margin=dict(l=10, r=10, t=10, b=60),
-             #paper_bgcolor="LightSteelBlue",
+        )
+
+        fig2 = px.scatter(df, x="ML", y="AP", opacity= 0.4)
+        fig2.update_traces(marker={'size': 1})
+        fig2.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
+                        marker_symbol = 'circle', name="Zero Point" ,marker_color='red',
+                        marker_size = 5))
+        fig2.update_layout(
+            
+             margin=dict(l=10, r=10, t=10, b=60),
         )
         
-        return fig
+        return fig1,fig2
 
-    fig = make_charts()
+    fig1, fig2 = make_charts()
 
 
-
-    col1,col2 = st.columns([2,1],gap='large')
+    st.write("#")
+    col1,col2 = st.columns([1,1],gap='small')
     with col1:
-        st.markdown("<h4 style='text-align: center; padding-top: 35px; color: Darkblue; font-weight:900'>Xn | Yn Chart</h1>", unsafe_allow_html=True)
+        st.markdown("**Xn | Yn Chart** (in cm)")
+        st.plotly_chart(fig1,use_container_width=True)
 
-        st.plotly_chart(fig,use_container_width=True)
-
-        
-    with col2:
-        st.markdown("<h4 style='text-align: center; padding-top: 35px; color: Darkblue; font-weight:100'>Infos</h1>", unsafe_allow_html=True)
+        st.markdown('**Results** (in cm) ')
         st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
         st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
         st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
-        st.write('Min & Max Xn::', round(min(df['Xn']),3),'&', round(max(df['Xn']),3))
-        st.write('Min & Max Yn::', round(min(df['Yn']),3),'&', round(max(df['Yn']),3))
-        st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
-
 
         
 
-    # st.write("")
-    # st.sidebar.write('Time range from', min(df['Rows_Count']), 'to', max(df['Rows_Count']), 'ms')
-    # st.sidebar.write('Min ML:', min(df['ML']))
-    # st.sidebar.write('Max AP:', max(df['ML']))
-    # st.sidebar.write('Min ML:',  min(df['AP']))
-    # st.sidebar.write('Max AP:',  max(df['AP']))
+    with col2:
+        st.markdown("**ML | AP Chart** (in cm)")
+        st.plotly_chart(fig2,use_container_width=True)
 
-    # col1,col2 = st.columns(2)
-    # with col1:
-    #     st.write('The Min & Max ML values of this time range are:', round(min(df['ML']),3), round(max(df['ML']),3))
-    #     st.write('The Min & Max AP values of this time range are:', round(min(df['AP']),3), round(max(df['AP']),3))
-    #     st.write('The Mean ML values of this time range are:', round(df['ML'].mean(),3))
-    #     st.write('The Mean AP values of this time range are:', round(df['AP'].mean(),3))
+        
+        #st.write('Min & Max Xn::', round(min(df['Xn']),3),'&', round(max(df['Xn']),3))
+        #st.write('Min & Max Yn::', round(min(df['Yn']),3),'&', round(max(df['Yn']),3))
+        #st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
 
 
-    # with col2:
-    #     st.write('The Min & Max Xn values of this time range are:', round(min(df['Xn']),3), round(max(df['Xn']),3))
-    #     st.write('The Min & Max Yn values of this time range are:', round(min(df['Yn']),3), round(max(df['Yn']),3))
-    #     st.write('The Mean ML values of this time range are:', df['Xn'].mean())
-    #     st.write('The Mean AP values of this time range are:', df['Yn'].mean())
-
-    
-
-
+    st.write("#")
     selected_clear_columns = st.multiselect(
     label='What column do you want to display', default=('Time','Xn', 'Yn'), help='Click to select', options=df.columns)
     st.write(df[selected_clear_columns])
