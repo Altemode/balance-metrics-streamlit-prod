@@ -155,6 +155,7 @@ def get_data():
 
 if url_list:
     df = get_data()
+
     min_time = int(df.index.min())
     max_time = int(df.index.max())
     min_ML = min(df['ML'])
@@ -162,6 +163,8 @@ if url_list:
     selected_time_range = st.sidebar.slider('Select the time range, per 100', min_time, max_time, (min_time, max_time), 100)
     df_selected_model = (df.Rows_Count.between(selected_time_range[0], selected_time_range[1]) )
     df = pd.DataFrame(df[df_selected_model])
+
+    df['Rn'] = ( (df['Xn'] ** 2) + (df['Yn'] ** 2) ) ** (1/2)
    
     #@st.cache  # No need for TTL this time. It's static data :)
     def make_charts():       
@@ -205,6 +208,7 @@ if url_list:
         st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
         st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
         st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
+        st.write('Mean Rn', df['Rn'].mean())
 
         
 
@@ -220,7 +224,7 @@ if url_list:
 
     st.write("#")
     selected_clear_columns = st.multiselect(
-    label='What column do you want to display', default=('Time','Xn', 'Yn'), help='Click to select', options=df.columns)
+    label='What column do you want to display', default=('Time','Xn', 'Yn','rn'), help='Click to select', options=df.columns)
     st.write(df[selected_clear_columns])
     st.download_button(
         label="Export Table",
