@@ -208,7 +208,9 @@ if url_list:
         st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
         st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
         st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
-        st.write('Mean Rn', df['Rn'].mean())
+        st.write('Mean Rn', round(df['Rn'].mean(),3))
+        st.write('Max Rn',  round(max(df['Rn']),3))
+        st.write('Min Rn',  round(min(df['Rn']),3))
 
         
 
@@ -224,7 +226,7 @@ if url_list:
 
     st.write("#")
     selected_clear_columns = st.multiselect(
-    label='What column do you want to display', default=('Time','Xn', 'Yn','rn'), help='Click to select', options=df.columns)
+    label='What column do you want to display', default=('Time','Xn', 'Yn','Rn'), help='Click to select', options=df.columns)
     st.write(df[selected_clear_columns])
     st.download_button(
         label="Export Table",
