@@ -108,15 +108,9 @@ if uploaded_file:
                 df_prepared['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
                 df_prepared['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
                 df_prepared['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
-                df_prepared = pd.DataFrame(df_raw_data[selected_area])
-
-                #df_prepared = pd.DataFrame(df_prepared[selected_area]) 
+                df_prepared = pd.DataFrame(df_prepared[selected_area])
             
-            # Slider 
-           
-
-            # Sliders
-        
+            
         
 
     col1, col2 = st.columns(2, gap='large')
