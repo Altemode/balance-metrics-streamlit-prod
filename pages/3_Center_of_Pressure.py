@@ -12,15 +12,26 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-
 ############# ############## PAGE 2 INSERT TO DATABASE USER+TRIAL ############## ############ #############################
 st.set_page_config(
-    page_title="Tefaa Metrics",
-    page_icon="🧊",
+    page_title="Balance App | SPESS",
+    page_icon="random",
     layout="wide",
     initial_sidebar_state="expanded",
     
 )
+
+# Create a connection with database
+def init_connection():
+    url = st.secrets["supabase_url"]
+    key = st.secrets["supabase_key"]
+    #client = create_client(url, key)
+    return create_client(url, key)
+con = init_connection()
+
+
+
+# Button to download a sample proper file:
 df = pd.read_csv('https://sportsmetrics.geth.gr/storage/BAL_LOAD-0_2ND_2022-11-04_12-32-00.csv')
 
 with st.sidebar.expander("Download a sample file:"):
@@ -30,20 +41,11 @@ with st.sidebar.expander("Download a sample file:"):
         file_name='sample.csv',
         mime='text/csv',
     )
-
-def init_connection():
-    url = st.secrets["supabase_url"]
-    key = st.secrets["supabase_key"]
-    #client = create_client(url, key)
-    return create_client(url, key)
-con = init_connection()
-
-st.title("Calculate Results")
+# Method to delete a entry from den database:
 with st.sidebar.expander("DELETE USER", expanded=False):
     st.error("Warning this is pernament")
     with st.form("delete user"):
         id_to_delete = st.number_input("Type ID of user to delete", value=0, step=1)
-        
         verify_delete_text_input = st.text_input("Type 'Delete' in the field above to proceed")
         id_to_delete_button = st.form_submit_button("Delete User")
 
@@ -62,15 +64,18 @@ with st.sidebar.expander("DELETE USER", expanded=False):
             st.warning("There is no entry with this id to delete!")
 
 
+# Main title of the page:
+st.title("Calculate Results")
+
+# Fetch and display the whole table with entries:
 url_list=[]
-with st.expander("List of all entries in database!", expanded=True):
+with st.expander("List of all entries from the database.", expanded=True):
     st.caption("Use the below search fields to filter the datatable!")
     #@st.experimental_memo(ttl=300)
     def select_all_from_balance_table():
         query=con.table("balance_table").select("*").execute()
         return query
     query = select_all_from_balance_table()
-
 
     df_balance_table = pd.DataFrame(query.data)
     if not df_balance_table.empty:
@@ -109,6 +114,7 @@ with st.expander("List of all entries in database!", expanded=True):
     else:
         st.write("There are no entries in the database! Please insert first!")
 
+# Method to run results:
 with st.sidebar.form("Type the ID of your link:", clear_on_submit=False):   
     url_id_number_input = st.number_input("Type the ID of the trial and Press 'Calculate Results' :",value = 0,step= 1)
     id_submitted = st.form_submit_button("Calculate Results")
@@ -139,13 +145,7 @@ def get_data():
         
         df['Rows_Count'] = df.index
         N = len(df)
-
-        # # Get the center of pressure on the x axis 
-        # center_of_pressure_x = (W/2)*(C2 + C3 - C1 - C4)/(C1 + C2 + C3 + C4) 
-
-        # # Get the center of pressure on the y axis 
-        # center_of_pressure_y = (L/2)*(C2 + C1 - C3 - C4)/(C1 + C2 + C3 + C4) 
-
+        
         df['Xn'] = df['ML'] - ( 1 / N ) * df['ML'].sum()
 
         df['Yn'] = df['AP'] - ( 1 / N ) * df['AP'].sum()

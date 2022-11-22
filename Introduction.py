@@ -1,24 +1,33 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Tefaa Metrics",
-    page_icon="🧊",
+    page_title="Balance App | SPESS",
+    page_icon="random",
     layout="wide",
     initial_sidebar_state="expanded",
     
 )
-st.subheader('School of Physical Education and Sports Science')
-st.markdown("# Main page")
-st.sidebar.markdown("# Main page ")
 
-st.write("# Welcome to SPESS Data Analysis for Balance Count Project!")
+st.title("Welcome to the Balance Data Analysis App.")
+st.subheader("In cooperation with the School of Physical Education and Sports Science of Athens.")
+st.write("#")
+st.sidebar.info("Select a page above.")
 
-st.sidebar.success("Select a app above.")
+col1, col2 = st.columns([2.5,1])
+with col1:
+    st.markdown("""
+        **Brief Description:**
 
-st.markdown(
-    "Navigate to left sidebar menu to choose your desire section!"
-)
+        Balance App developed for the purpose of research of School of Physical Education and Sports Science of Athens. 
+        For this purpose a force platform by PLUX Biosignals has been used to test balance and collects the raw data of athletes.
+        
+        The main scope of this app is to be calculate the ballance of athletes by collecing raw data from the force platform,
+        proccesing these and calculating the center of pressure in the x and y axis (ML & AP).
+        For these reason the streamlit app framework is a great choice to transform the python code into a nice wep app.
 
-st.markdown(
-    "Prepare your file: You can edit and prepare your file ready for calculation!"
-)
+        **Navigate to the left menu sidebar to choose a page.**
+
+        """
+    )
+with col2:
+    st.write("")
