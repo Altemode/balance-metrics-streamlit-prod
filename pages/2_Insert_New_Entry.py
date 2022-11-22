@@ -27,16 +27,11 @@ def init_connection():
     return create_client(url, key)
 con = init_connection()
 
+st.title("Insert new trial to database")
 
-st.sidebar.info("Hello, lets try to insert a new entry to database!!!!!!")
-st.sidebar.info("- Give the full name of the person!")
-st.sidebar.info("- Give the email adress of the person!")
-st.sidebar.info("- Give the occupy of the person!")
-st.sidebar.info("- Choose the proper kind of trial!")
-st.sidebar.info("- Choose the file of the trial. Please use only undescrores, not spaces in the file name!")
-st.sidebar.info("- Click on Show All Entries to check the database!")
-
-st.title("Import Entry to Database!")
+st.sidebar.info("**Instructions**")
+st.sidebar.info("-If you wish to enter an attempt for a user that exists in the database then select the user from the drop down menu and then edit the fields as desired.")
+st.sidebar.info("-If you wish to enter an attempt for a user that does not belong to the database then simply fill in the following fields.")
 
 
 def select_all_from_balance_table():
@@ -48,27 +43,32 @@ df_balance_table = pd.DataFrame(query.data)
 
 df_balance_table_unique_values = df_balance_table.copy()
 
-fullname_input = st.selectbox("Select a person from the database or fill in the fields below. " , (df_balance_table_unique_values['fullname']))
+df_balance_table_unique_values.sort_values(by=['created_at'], inplace=True, ascending=True)
+
+st.write("**Select a person from the database or fill in the fields below.**")
+fullname_input = st.selectbox("Select Entry." , (df_balance_table_unique_values['fullname']))
 row_index = df_balance_table_unique_values.index[df_balance_table_unique_values['fullname']==fullname_input].tolist()
 st.markdown("""---""")
 
 #Create the Form to submit data to database:
+st.write("**Entry Form.**")
+st.caption("Fields with * are required.")
 with st.form("Create a new entry", clear_on_submit=False):
     col1,col2,col3 = st.columns(3)
     with col1:
-        fullname = st.text_input("Fullname", value = df_balance_table_unique_values.loc[row_index[0]]['fullname'])
-        age = st.number_input("Age", value = int(df_balance_table_unique_values.loc[row_index[0]]['age']), min_value=0, max_value=100, step=1)
-        kind_of_trial = st.selectbox("Kind of Trial", ('-','SB Bilateral', 'SB Unilateral (LL)','SB Unilateral (RL)','SB Unilateral (RL)', 'Tandem' ))
+        fullname = st.text_input("Fullname*", value = df_balance_table_unique_values.loc[row_index[0]]['fullname'], help="The name & surname of the person.")
+        age = st.number_input("Age", value = int(df_balance_table_unique_values.loc[row_index[0]]['age']), min_value=0, max_value=100, step=1, help= 'The age in years of the person.')
+        kind_of_trial = st.selectbox("Kind of Trial*", ('-','SB Bilateral', 'SB Unilateral (LL)','SB Unilateral (RL)','SB Unilateral (RL)', 'Tandem' ), help="Select the kind of the trial.")
     with col2:
-        weight = st.number_input("Weight in kg", value = df_balance_table_unique_values.loc[row_index[0]]['weight'])
+        weight = st.number_input("Weight*", value = df_balance_table_unique_values.loc[row_index[0]]['weight'], help='The weight of the person in kg.')
         email = st.text_input("Email address")
-        occupy = st.text_input("Occupy", value = df_balance_table_unique_values.loc[row_index[0]]['occupy'])
+        occupy = st.text_input("Occupy", value = df_balance_table_unique_values.loc[row_index[0]]['occupy'], help="The occupy of the person.")
     with col3:
-        height = st.number_input("Height in cm", value = df_balance_table_unique_values.loc[row_index[0]]['height'])
-        instructor = st.text_input("Instructor")
-        description = st.text_area('More Description (optional)')
-    filepath = st.file_uploader("Choose a file")
-    submitted = st.form_submit_button("Submit values")
+        height = st.number_input("Height", value = df_balance_table_unique_values.loc[row_index[0]]['height'], help="The height of the person in cm.")
+        instructor = st.text_input("Instructor*", value = df_balance_table_unique_values.loc[row_index[0]]['instructor'], help="The name & surname of the instructor.")
+        description = st.text_area('More Description (optional)', help="Extra information about the trial.")
+    filepath = st.file_uploader("Choose a file*", help="The file that you prepared in the 'Prepare File' page in csv.")
+    submitted = st.form_submit_button("Submit values", help="By pressing this button, a new entry registers into database.")
 
 
     if submitted:
