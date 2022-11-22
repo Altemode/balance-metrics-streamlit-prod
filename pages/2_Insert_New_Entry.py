@@ -54,17 +54,23 @@ st.markdown("""---""")
 
 #Create the Form to submit data to database:
 with st.form("Create a new entry", clear_on_submit=False):
-    fullname = st.text_input("Fullname", value = df_balance_table_unique_values.loc[row_index[0]]['fullname'])
-    age = st.number_input("Age", value = int(df_balance_table_unique_values.loc[row_index[0]]['age']), min_value=0, max_value=100, step=1)
-    height = st.number_input("Height in cm", value = df_balance_table_unique_values.loc[row_index[0]]['height'])
-    weight = st.number_input("Weight in kg", value = df_balance_table_unique_values.loc[row_index[0]]['weight'])
-    email = st.text_input("Email address")
-    occupy = st.text_input("Occupy", value = df_balance_table_unique_values.loc[row_index[0]]['occupy'])
-    #type_of_trial = st.selectbox("Kind of Trial", ('-','CMJ', 'SJ','DJ','ISO' ))
+    col1,col2,col3 = st.columns(3)
+    with col1:
+        fullname = st.text_input("Fullname", value = df_balance_table_unique_values.loc[row_index[0]]['fullname'])
+        age = st.number_input("Age", value = int(df_balance_table_unique_values.loc[row_index[0]]['age']), min_value=0, max_value=100, step=1)
+        kind_of_trial = st.selectbox("Kind of Trial", ('-','SB Bilateral', 'SB Unilateral (LL)','SB Unilateral (RL)','SB Unilateral (RL)', 'Tandem' ))
+    with col2:
+        weight = st.number_input("Weight in kg", value = df_balance_table_unique_values.loc[row_index[0]]['weight'])
+        email = st.text_input("Email address")
+        occupy = st.text_input("Occupy", value = df_balance_table_unique_values.loc[row_index[0]]['occupy'])
+    with col3:
+        height = st.number_input("Height in cm", value = df_balance_table_unique_values.loc[row_index[0]]['height'])
+        instructor = st.text_input("Instructor")
+        description = st.text_area('More Description (optional)')
     filepath = st.file_uploader("Choose a file")
-    #checkbox_val = st.checkbox("Form checkbox")
     submitted = st.form_submit_button("Submit values")
-    
+
+
     if submitted:
         
         if fullname and age and height and weight and occupy !='-' :
@@ -105,7 +111,7 @@ with st.form("Create a new entry", clear_on_submit=False):
             list = (fullname,email,occupy,filename)
             def add_entries_to_balance_table(supabase):
                 value = {'fullname': fullname, "age": age, "height": height, "weight": weight , 'email': email, 'occupy': occupy, 
-                         "filepath": filepath, 'filename': filename}
+                         "filepath": filepath, 'filename': filename, 'kind_of_trial': kind_of_trial, 'description': description, 'instructor': instructor}
                 data = supabase.table('balance_table').insert(value).execute()
             def main():
                 new_entry = add_entries_to_balance_table(con)

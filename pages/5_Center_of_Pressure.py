@@ -63,9 +63,8 @@ with st.sidebar.expander("DELETE USER", expanded=False):
 
 
 url_list=[]
-with st.expander("From here you may display and calculate results from any entry of the database!", expanded=True):
+with st.expander("List of all entries in database!", expanded=True):
     st.caption("Use the below search fields to filter the datatable!")
-    #uploaded_file = st.file_uploader("Choose a file1")
     #@st.experimental_memo(ttl=300)
     def select_all_from_balance_table():
         query=con.table("balance_table").select("*").execute()
@@ -75,31 +74,32 @@ with st.expander("From here you may display and calculate results from any entry
 
     df_balance_table = pd.DataFrame(query.data)
     if not df_balance_table.empty:
-        df_balance_table.columns = ['ID', 'Created At', 'Fullname', 'Age', 'Height', 'Weight', 'Email', 'Occupy', 'Filepath', 'Filename']
-        col1, col2 = st.columns([2,2])
+        df_balance_table.columns = ['ID', 'Created At', 'Fullname', 'Age', 'Height', 'Weight', 'Email', 'Occupy', 'Filepath', 'Filename', 'Type of trial', 'Description', 'Instructor']
+        col1, col2 = st.columns(2)
         with col2:
-            occupy_search = st.text_input("Occupy:")
+            instructor_search = st.text_input("Instructor:")
         with col1:
             fullname_search = st.text_input("Fullname:")
-            
 
-        if not occupy_search and not fullname_search :
-            df_balance_table[['ID', 'Created At', 'Fullname', 'Age', 'Height', 'Weight', 'Email', 'Occupy', 'Filepath', 'Filename']]
+        if not instructor_search and not fullname_search :
+            df_balance_table.sort_values(by=['Created At'], inplace=True, ascending=True)
+            df_balance_table = df_balance_table.iloc[1:]
+            df_balance_table[['ID', 'Created At', 'Fullname', 'Age', 'Height', 'Weight', 'Email', 'Occupy', 'Filepath', 'Filename', 'Type of trial', 'Description', 'Instructor']]
         
-        elif fullname_search and not occupy_search :
+        elif fullname_search and not instructor_search :
             st.dataframe(df_balance_table[df_balance_table['Fullname']== fullname_search])
 
-        elif occupy_search and not fullname_search :
-            st.dataframe(df_balance_table[df_balance_table['Occupy']== occupy_search])
+        elif instructor_search and not fullname_search :
+            st.dataframe(df_balance_table[df_balance_table['Instructor']== instructor_search])
 
-        elif fullname_search and occupy_search :
-            df_balance_table[(df_balance_table['Fullname'] == fullname_search) & (df_balance_table['Occupy'] == occupy_search)]
+        elif fullname_search and instructor_search :
+            df_balance_table[(df_balance_table['Fullname'] == fullname_search) & (df_balance_table['Instructor'] == instructor_search)]
         
-        elif occupy_search :
-            df_balance_table[(df_balance_table['Occupy'] == occupy_search) ]
+        elif instructor_search :
+            df_balance_table[(df_balance_table['Instructor'] == instructor_search) ]
         
-        elif fullname_search and occupy_search :
-            df_balance_table[(df_balance_table['Occupy'] == occupy_search) & (df_balance_table['Fullname'] == fullname_search)]
+        elif fullname_search and instructor_search :
+            df_balance_table[(df_balance_table['Instructor'] == instructor_search) & (df_balance_table['Fullname'] == fullname_search)]
 
         #url_id_number_input = st.number_input("Type the ID of the person you want to calculate results of the current trial.",value=0,step=1)
 
@@ -110,7 +110,7 @@ with st.expander("From here you may display and calculate results from any entry
         st.write("There are no entries in the database! Please insert first!")
 
 with st.sidebar.form("Type the ID of your link:", clear_on_submit=False):   
-    url_id_number_input = st.number_input("Type the ID of your prerferred trial and Press Calculate Results:",value = 0,step= 1)
+    url_id_number_input = st.number_input("Type the ID of the trial and Press 'Calculate Results' :",value = 0,step= 1)
     id_submitted = st.form_submit_button("Calculate Results")
     # Querry to find the data row of specific ID
     if url_id_number_input:
@@ -123,7 +123,7 @@ with st.sidebar.form("Type the ID of your link:", clear_on_submit=False):
         # List with values depending on the querry
         if url_list:
             url = url_list[0]['filepath'].replace(" ", "%20")
-            st.write("Person ID:", url_list[0]['id'],url_list[0]['filepath'])
+            st.write("Person ID:", url_list[0]['id'])
         else:
             st.write("There is no entry with this ID")
 
@@ -150,7 +150,6 @@ def get_data():
 
         df['Yn'] = df['AP'] - ( 1 / N ) * df['AP'].sum()
 
-        
     return df
 
 if url_list:
@@ -171,39 +170,42 @@ if url_list:
         fig1 = px.scatter(df, x="Xn", y="Yn", opacity= 0.4)
         fig1.update_traces(marker={'size': 1})
         fig1.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
-                        marker_symbol = 'circle', name="Zero Point" ,marker_color='red',
+                        marker_symbol = 'circle', name="ML/AP Point" ,marker_color='red',
                         marker_size = 5))
         fig1.update_layout(
-            yaxis=dict(
-                range=[-8, 8]
-            ),
-            xaxis=dict(
-                range=[-8, 8]
-            ),
+            # yaxis=dict(
+            #     range=[-8, 8]
+            # ),
+            # xaxis=dict(
+            #     range=[-8, 8]
+            # ),
              margin=dict(l=10, r=10, t=10, b=60),
-        )
+        )        
+        return fig1
 
-        fig2 = px.scatter(df, x="ML", y="AP", opacity= 0.4)
-        fig2.update_traces(marker={'size': 1})
-        fig2.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
-                        marker_symbol = 'circle', name="Zero Point" ,marker_color='red',
-                        marker_size = 5))
-        fig2.update_layout(
-            
-             margin=dict(l=10, r=10, t=10, b=60),
-        )
-        
-        return fig1,fig2
-
-    fig1, fig2 = make_charts()
-
+    fig1 = make_charts()
 
     st.write("#")
-    col1,col2 = st.columns([1,1],gap='small')
+    st.subheader("Details about this trial:")
+    col1,col2,col3,col4,col5 = st.columns(5, gap="small")
+    with col1:
+        st.write("**Instructor:**", url_list[0]['instructor'])
+    with col2:
+        st.write("**Fullname:**", url_list[0]['fullname'])
+    with col3:
+        st.write("**Weight:**", url_list[0]['weight'])
+    with col4:
+        st.write("**Kind of the trial:**", url_list[0]['kind_of_trial'])
+    with col5:
+        st.write("**Date:**", url_list[0]['created_at'])
+    st.write("---")
+
+    col1,col2 = st.columns([3,1],gap='large')
     with col1:
         st.markdown("**Xn | Yn Chart** (in cm)")
         st.plotly_chart(fig1,use_container_width=True)
-
+    with col2:
+        st.write("#")
         st.markdown('**Results** (in cm) ')
         st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
         st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
@@ -211,17 +213,6 @@ if url_list:
         st.write('Mean Rn', round(df['Rn'].mean(),3))
         st.write('Max Rn',  round(max(df['Rn']),3))
         st.write('Min Rn',  round(min(df['Rn']),3))
-
-        
-
-    with col2:
-        st.markdown("**ML | AP Chart** (in cm)")
-        st.plotly_chart(fig2,use_container_width=True)
-
-        
-        #st.write('Min & Max Xn::', round(min(df['Xn']),3),'&', round(max(df['Xn']),3))
-        #st.write('Min & Max Yn::', round(min(df['Yn']),3),'&', round(max(df['Yn']),3))
-        #st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
 
 
     st.write("#")
