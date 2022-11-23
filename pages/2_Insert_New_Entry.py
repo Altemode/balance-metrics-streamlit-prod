@@ -7,16 +7,25 @@ import ftplib
 import tempfile
 from pathlib import Path
 import numpy as np
-
+from pathlib import Path
 
 ############# ############## PAGE 2 INSERT TO DATABASE USER+TRIAL ############## ############ #############################
 st.set_page_config(
-    page_title="Tefaa Metrics",
-    page_icon="🧊",
+    page_title="Balance App | SPESS",
+    page_icon="random",
     layout="wide",
     initial_sidebar_state="expanded",
-    
 )
+
+
+# #Define paths:
+# current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+# css_file = current_dir / "style" / "style.css"
+
+# #Load css:
+# with open(css_file) as f:
+#     st.write("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
+
 
 #Make the connection with Supabase - Database:
 @st.experimental_singleton
@@ -30,10 +39,10 @@ con = init_connection()
 st.title("Insert new trial to database")
 
 st.sidebar.info("**Instructions**")
-st.sidebar.info("-If you wish to enter an attempt for a user that exists in the database then select the user from the drop down menu and then edit the fields as desired.")
-st.sidebar.info("-If you wish to enter an attempt for a user that does not belong to the database then simply fill in the following fields.")
+st.sidebar.info("-If you want to enter an attempt for a user that exists in the database then select the user from the drop down menu and then edit the fields as desired.")
+st.sidebar.info("-If you want to enter an attempt for a user that does not belong to the database then simply fill in the following fields.")
 
-
+# Fetch all entries from the balance_table:
 def select_all_from_balance_table():
     query=con.table("balance_table").select("*").execute()
     return query

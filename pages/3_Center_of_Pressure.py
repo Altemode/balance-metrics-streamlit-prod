@@ -145,7 +145,7 @@ def get_data():
         
         df['Rows_Count'] = df.index
         N = len(df)
-        
+
         df['Xn'] = df['ML'] - ( 1 / N ) * df['ML'].sum()
 
         df['Yn'] = df['AP'] - ( 1 / N ) * df['AP'].sum()
@@ -170,7 +170,7 @@ if url_list:
         fig1 = px.scatter(df, x="Xn", y="Yn", opacity= 0.4)
         fig1.update_traces(marker={'size': 1})
         fig1.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
-                        marker_symbol = 'circle', name="ML/AP Point" ,marker_color='red',
+                        marker_symbol = 'circle', name="ML/AP Point", marker_color='red',
                         marker_size = 5))
         fig1.update_layout(
             # yaxis=dict(
@@ -195,7 +195,7 @@ if url_list:
     with col3:
         st.write("**Weight:**", url_list[0]['weight'])
     with col4:
-        st.write("**Kind of the trial:**", url_list[0]['kind_of_trial'])
+        st.write("**Type of the trial:**", url_list[0]['kind_of_trial'])
     with col5:
         st.write("**Date:**", url_list[0]['created_at'])
     st.write("---")

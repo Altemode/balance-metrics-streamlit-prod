@@ -63,16 +63,17 @@ def get_data():
         # Calculate the sum of all sensors Mass $ Weight
         df_raw_data['Mass_Sum'] = (df_raw_data['Mass_1'] + df_raw_data['Mass_2'] + df_raw_data['Mass_3'] + df_raw_data['Mass_4'])
         df_raw_data['Rows_Count'] = df_raw_data.index
-        mean_weight_A = df_raw_data.loc[0:500, 'Mass_1'].mean()
-        mean_weight_B = df_raw_data.loc[0:500, 'Mass_2'].mean()
-        mean_weight_C = df_raw_data.loc[0:500, 'Mass_3'].mean()
-        mean_weight_D = df_raw_data.loc[0:500, 'Mass_4'].mean()
-        df_raw_data['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
-        df_raw_data['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
-        df_raw_data['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
-        df_raw_data['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
 
-        return df_raw_data
+        # mean_weight_A = df_raw_data.loc[0:500, 'Mass_1'].mean()
+        # mean_weight_B = df_raw_data.loc[0:500, 'Mass_2'].mean()
+        # mean_weight_C = df_raw_data.loc[0:500, 'Mass_3'].mean()
+        # mean_weight_D = df_raw_data.loc[0:500, 'Mass_4'].mean()
+        # df_raw_data['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
+        # df_raw_data['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
+        # df_raw_data['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
+        # df_raw_data['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
+
+        return df_raw_data, columns_count
 
 if uploaded_file:
     

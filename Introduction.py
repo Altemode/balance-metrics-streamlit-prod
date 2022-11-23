@@ -1,4 +1,5 @@
 import streamlit as st
+from pathlib import Path
 
 st.set_page_config(
     page_title="Balance App | SPESS",
@@ -7,6 +8,16 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     
 )
+
+# #Define paths:
+# current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+# css_file = current_dir / "style" / "style.css"
+
+# #Load css:
+# with open(css_file) as f:
+#     st.write("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
+
+
 
 st.title("Welcome to the Balance Data Analysis App.")
 st.subheader("In cooperation with the School of Physical Education and Sports Science of Athens.")
