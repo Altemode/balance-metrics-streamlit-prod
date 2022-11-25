@@ -169,8 +169,14 @@ if url_list:
     def make_charts():       
         fig1 = px.scatter(df, x="Xn", y="Yn", opacity= 0.4)
         fig1.update_traces(marker={'size': 1})
+        #fig1.layout.xaxis.color = 'red'
+        #fig1.layout.xaxis.title = 'Dates'
+
         fig1.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
                         marker_symbol = 'circle', name="ML/AP Point", marker_color='red',
+                        marker_size = 5))
+        fig1.add_trace(go.Scatter(x=[0], y=[0], mode = 'markers',
+                        marker_symbol = 'circle', name="Zero Point", marker_color='red',
                         marker_size = 5))
         fig1.update_layout(
             # yaxis=dict(

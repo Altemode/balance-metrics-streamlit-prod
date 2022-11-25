@@ -73,7 +73,7 @@ def get_data():
         # df_raw_data['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
         # df_raw_data['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
 
-        return df_raw_data, columns_count
+        return df_raw_data
 
 if uploaded_file:
     
@@ -83,7 +83,7 @@ if uploaded_file:
     #     get_data()
     if df_raw_data is not None:
         #df_prepared = df_raw_data.copy()
-        min_time = int(df_raw_data.index.min())
+        min_time = int(df_raw_data.index.min()) 
         max_time = int(df_raw_data.index.max())
         
         with st.form("Give the numbers"):
