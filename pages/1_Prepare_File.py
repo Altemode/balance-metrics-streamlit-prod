@@ -116,64 +116,64 @@ if uploaded_file:
             
         
 
-    col1, col2 = st.columns(2, gap='large')
-    with col1:
-        ### CHART A ###
-        if submitted:
-            fig_trigger = px.line(df_prepared, x="Time", y="Trigger")
-            fig_trigger.update_layout(
-                            margin=dict(l=0, r=20, t=0, b=60),
-                            #paper_bgcolor="LightSteelBlue",   
-                        )
-            fig1 = px.line(df_prepared, x="Time", y="Mass_1", title='Sensor A')
-            fig1.update_layout(
-                            margin=dict(l=0, r=20, t=30, b=0),
-                            #paper_bgcolor="LightSteelBlue",   
-                        )
-            st.plotly_chart(fig1, use_container_width=True)
-            st.plotly_chart(fig_trigger, use_container_width=True)
+    # col1, col2 = st.columns(2, gap='large')
+    # with col1:
+    ### CHART A ###
+    if submitted:
+        fig_trigger = px.line(df_prepared, x="Time", y="Trigger")
+        fig_trigger.update_layout(
+                        margin=dict(l=0, r=20, t=0, b=60),
+                        #paper_bgcolor="LightSteelBlue",   
+                    )
+        fig1 = px.line(df_prepared, x="Time", y="Mass_1", title='Sensor A')
+        fig1.update_layout(
+                        margin=dict(l=0, r=20, t=30, b=0),
+                        #paper_bgcolor="LightSteelBlue",   
+                    )
+        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig_trigger, use_container_width=True)
 
-        else:
-            fig_trigger = px.line(df_raw_data, x="Time", y="Trigger")
-            fig_trigger.update_layout(
-                            margin=dict(l=0, r=20, t=0, b=60),
-                            #paper_bgcolor="LightSteelBlue",   
-                        )
-            fig1 = px.line(df_raw_data, x="Time", y="Mass_1", title='Sensor A')
-            fig1.update_layout(
-                            margin=dict(l=0, r=20, t=30, b=0),
-                            #paper_bgcolor="LightSteelBlue",   
-                        )
-            st.plotly_chart(fig1, use_container_width=True)
-            st.plotly_chart(fig_trigger, use_container_width=True)
+    else:
+        fig_trigger = px.line(df_raw_data, x="Time", y="Trigger")
+        fig_trigger.update_layout(
+                        margin=dict(l=0, r=20, t=0, b=60),
+                        #paper_bgcolor="LightSteelBlue",   
+                    )
+        fig1 = px.line(df_raw_data, x="Time", y="Mass_1", title='Sensor A')
+        fig1.update_layout(
+                        margin=dict(l=0, r=20, t=30, b=0),
+                        #paper_bgcolor="LightSteelBlue",   
+                    )
+        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig_trigger, use_container_width=True)
 
 
-        #### CHART C ####
-        if submitted:
-            fig3 = px.line(df_prepared, x="Time", y="Mass_3", title='Sensor C')
-            st.plotly_chart(fig3, use_container_width=True)
+    #     #### CHART C ####
+    #     if submitted:
+    #         fig3 = px.line(df_prepared, x="Time", y="Mass_3", title='Sensor C')
+    #         st.plotly_chart(fig3, use_container_width=True)
 
-        else:
-            fig3 = px.line(df_raw_data, x="Time", y="Mass_3", title='Sensor C')
-            st.plotly_chart(fig3, use_container_width=True)            
+    #     else:
+    #         fig3 = px.line(df_raw_data, x="Time", y="Mass_3", title='Sensor C')
+    #         st.plotly_chart(fig3, use_container_width=True)            
         
-    with col2:
-        ### CHART B ####
-        if submitted:
-            fig2 = px.line(df_prepared, x="Time", y="Mass_2", title='Sensor B')
-            st.plotly_chart(fig2, use_container_width=True)
-        else:
-            fig2 = px.line(df_raw_data, x="Time", y="Mass_2", title='Sensor B')
-            st.plotly_chart(fig2, use_container_width=True) 
+    # with col2:
+    #     ### CHART B ####
+    #     if submitted:
+    #         fig2 = px.line(df_prepared, x="Time", y="Mass_2", title='Sensor B')
+    #         st.plotly_chart(fig2, use_container_width=True)
+    #     else:
+    #         fig2 = px.line(df_raw_data, x="Time", y="Mass_2", title='Sensor B')
+    #         st.plotly_chart(fig2, use_container_width=True) 
 
 
-        ### CHART D ####
-        if submitted:
-            fig4 = px.line(df_prepared, x="Time", y="Mass_4", title='Sensor D')
-            st.plotly_chart(fig2, use_container_width=True)
-        else:
-            fig4 = px.line(df_raw_data, x="Time", y="Mass_4", title='Sensor D')
-            st.plotly_chart(fig4, use_container_width=True)
+    #     ### CHART D ####
+    #     if submitted:
+    #         fig4 = px.line(df_prepared, x="Time", y="Mass_4", title='Sensor D')
+    #         st.plotly_chart(fig2, use_container_width=True)
+    #     else:
+    #         fig4 = px.line(df_raw_data, x="Time", y="Mass_4", title='Sensor D')
+    #         st.plotly_chart(fig4, use_container_width=True)
 
     if submitted :
 
