@@ -39,11 +39,11 @@ with st.expander("Show File Form", expanded=True):
 @st.cache  # No need for TTL this time. It's static data :)
 def get_data():
     if uploaded_file:
-        df_raw_data = pd.read_csv(uploaded_file, sep='\s+', skiprows=10, index_col = None)
+        df_raw_data = pd.read_csv(uploaded_file, sep='\s+', skiprows=3, index_col = None)
         #Define Header columns
         columns_count = len(df_raw_data.axes[1])
         if columns_count == 6:
-            df_raw_data.columns = ['Time', 'Col_2', 'Mass_1', 'Mass_2', 'Mass_3', 'Mass_4']
+            df_raw_data.columns = ['Time', 'Trigger', 'Mass_1', 'Mass_2', 'Mass_3', 'Mass_4']
         
         C = 406.831
         #sr = 1000
@@ -64,27 +64,28 @@ def get_data():
         df_raw_data['Mass_Sum'] = (df_raw_data['Mass_1'] + df_raw_data['Mass_2'] + df_raw_data['Mass_3'] + df_raw_data['Mass_4'])
         df_raw_data['Rows_Count'] = df_raw_data.index
 
-        # mean_weight_A = df_raw_data.loc[0:500, 'Mass_1'].mean()
-        # mean_weight_B = df_raw_data.loc[0:500, 'Mass_2'].mean()
-        # mean_weight_C = df_raw_data.loc[0:500, 'Mass_3'].mean()
-        # mean_weight_D = df_raw_data.loc[0:500, 'Mass_4'].mean()
-        # df_raw_data['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
-        # df_raw_data['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
-        # df_raw_data['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
-        # df_raw_data['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
+        mean_weight_A = df_raw_data.loc[0:500, 'Mass_1'].mean()
+        mean_weight_B = df_raw_data.loc[0:500, 'Mass_2'].mean()
+        mean_weight_C = df_raw_data.loc[0:500, 'Mass_3'].mean()
+        mean_weight_D = df_raw_data.loc[0:500, 'Mass_4'].mean()
+        df_raw_data['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
+        df_raw_data['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
+        df_raw_data['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
+        df_raw_data['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
 
         return df_raw_data
 
 if uploaded_file:
     
     df_raw_data= get_data()
-    
+    st.dataframe(df_raw_data, use_container_width=True)
+
     # if st.button('Reload Dataframe with Raw Data'):
     #     get_data()
     if df_raw_data is not None:
         #df_prepared = df_raw_data.copy()
-        min_time = int(df_raw_data.index.min()) 
-        max_time = int(df_raw_data.index.max())
+        min_time = int(df_raw_data['Time'].min()) 
+        max_time = int(df_raw_data['Time'].max())
         
         with st.form("Give the numbers"):
             col1,col2 = st.columns(2)
@@ -96,7 +97,7 @@ if uploaded_file:
             
             
             selected_time_range = st.slider('Select the whole time range of the graph, per 1000', min_time, max_time, (min_time, max_time), 1)
-            selected_area = (df_raw_data.Rows_Count.between(selected_time_range[0], selected_time_range[1]) )
+            selected_area = (df_raw_data.Time.between(selected_time_range[0], selected_time_range[1]) )
 
             submitted = st.form_submit_button("Calculate")
 
@@ -119,55 +120,77 @@ if uploaded_file:
     with col1:
         ### CHART A ###
         if submitted:
-            fig1 = px.line(df_prepared, x="Rows_Count", y="Mass_1", title='Sensor A')
+            fig_trigger = px.line(df_prepared, x="Time", y="Trigger")
+            fig_trigger.update_layout(
+                            margin=dict(l=0, r=20, t=0, b=60),
+                            #paper_bgcolor="LightSteelBlue",   
+                        )
+            fig1 = px.line(df_prepared, x="Time", y="Mass_1", title='Sensor A')
+            fig1.update_layout(
+                            margin=dict(l=0, r=20, t=30, b=0),
+                            #paper_bgcolor="LightSteelBlue",   
+                        )
             st.plotly_chart(fig1, use_container_width=True)
+            st.plotly_chart(fig_trigger, use_container_width=True)
+
         else:
-            fig1 = px.line(df_raw_data, x="Rows_Count", y="Mass_1", title='Sensor A')
+            fig_trigger = px.line(df_raw_data, x="Time", y="Trigger")
+            fig_trigger.update_layout(
+                            margin=dict(l=0, r=20, t=0, b=60),
+                            #paper_bgcolor="LightSteelBlue",   
+                        )
+            fig1 = px.line(df_raw_data, x="Time", y="Mass_1", title='Sensor A')
+            fig1.update_layout(
+                            margin=dict(l=0, r=20, t=30, b=0),
+                            #paper_bgcolor="LightSteelBlue",   
+                        )
             st.plotly_chart(fig1, use_container_width=True)
+            st.plotly_chart(fig_trigger, use_container_width=True)
 
 
         #### CHART C ####
         if submitted:
-            fig3 = px.line(df_prepared, x="Rows_Count", y="Mass_3", title='Sensor C')
+            fig3 = px.line(df_prepared, x="Time", y="Mass_3", title='Sensor C')
             st.plotly_chart(fig3, use_container_width=True)
+
         else:
-            fig3 = px.line(df_raw_data, x="Rows_Count", y="Mass_3", title='Sensor C')
+            fig3 = px.line(df_raw_data, x="Time", y="Mass_3", title='Sensor C')
             st.plotly_chart(fig3, use_container_width=True)            
         
     with col2:
         ### CHART B ####
         if submitted:
-            fig2 = px.line(df_prepared, x="Rows_Count", y="Mass_2", title='Sensor B')
+            fig2 = px.line(df_prepared, x="Time", y="Mass_2", title='Sensor B')
             st.plotly_chart(fig2, use_container_width=True)
         else:
-            fig2 = px.line(df_raw_data, x="Rows_Count", y="Mass_2", title='Sensor B')
+            fig2 = px.line(df_raw_data, x="Time", y="Mass_2", title='Sensor B')
             st.plotly_chart(fig2, use_container_width=True) 
 
 
         ### CHART D ####
         if submitted:
-            fig4 = px.line(df_prepared, x="Rows_Count", y="Mass_4", title='Sensor D')
+            fig4 = px.line(df_prepared, x="Time", y="Mass_4", title='Sensor D')
             st.plotly_chart(fig2, use_container_width=True)
         else:
-            fig4 = px.line(df_raw_data, x="Rows_Count", y="Mass_4", title='Sensor D')
+            fig4 = px.line(df_raw_data, x="Time", y="Mass_4", title='Sensor D')
             st.plotly_chart(fig4, use_container_width=True)
 
-        if submitted :
+    if submitted :
 
-            # To Drop the unnecessary Columns
-            df_prepared.drop(['Rows_Count'], axis = 1, inplace=True)
-            filename = uploaded_file.name
-            # To Get only the filename without extension (.txt)
-            final_filename = os.path.splitext(filename)[0]
-            st.write("The file name of your file is : ", final_filename)
-            show_df_prepared = st.checkbox("Display the final dataframe")
-            st.dataframe(df_prepared)
-            st.download_button(
-                label="Export File",
-                data=df_prepared.to_csv(index=False),
-                file_name=final_filename +'.csv',
-                mime='text/csv',
-            )
+        # To Drop the unnecessary Columns
+        #df_prepared.drop(['Time'], axis = 1, inplace=True)
+        filename = uploaded_file.name
+        # To Get only the filename without extension (.txt)
+        final_filename = os.path.splitext(filename)[0]
+        st.write("The file name of your file is : ", final_filename)
+        show_df_prepared = st.checkbox("Display the final dataframe")
+        st.dataframe(df_prepared)
+        st.download_button(
+            label="Export File",
+            data=df_prepared.to_csv(index=False),
+            file_name=final_filename +'.csv',
+            mime='text/csv',
+        )
             
 
 

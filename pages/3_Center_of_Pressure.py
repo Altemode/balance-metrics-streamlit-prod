@@ -140,8 +140,8 @@ def get_data():
         df = pd.read_csv(url_list[0]['filepath'].replace(" ", "%20"), storage_options=storage_options)
         W = 450
         L = 450
-        df['ML'] = ( (W / 2) * (( df['Mass_2'] + df['Mass_3'] - df['Mass_1'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] ) ) /10
-        df['AP'] = ( (L / 2) * (( df['Mass_2'] + df['Mass_1'] - df['Mass_3'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] ) ) /10
+        df['ML'] =  (W / 2) * (( df['Mass_2'] + df['Mass_3'] - df['Mass_1'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] )
+        df['AP'] =  (L / 2) * (( df['Mass_2'] + df['Mass_1'] - df['Mass_3'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] ) 
         
         df['Rows_Count'] = df.index
         N = len(df)
@@ -154,7 +154,7 @@ def get_data():
 
 if url_list:
     df = get_data()
-
+    st.dataframe(df, use_container_width=True)
     min_time = int(df.index.min())
     max_time = int(df.index.max())
     min_ML = min(df['ML'])
@@ -224,7 +224,7 @@ if url_list:
     st.write("#")
     selected_clear_columns = st.multiselect(
     label='What column do you want to display', default=('Time','Xn', 'Yn','Rn'), help='Click to select', options=df.columns)
-    st.write(df[selected_clear_columns])
+    st.dataframe(df[selected_clear_columns], use_container_width=True)
     st.download_button(
         label="Export Table",
         data=df[selected_clear_columns].to_csv(),
