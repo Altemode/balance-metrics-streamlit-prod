@@ -29,14 +29,8 @@ st.sidebar.info("-Use the slider to select the time period you want.")
 st.sidebar.info("-Finaly check the Verify box and export the file from the 'Export File' button!")
 
 
-
-
 with st.expander("Show File Form", expanded=True):
     uploaded_file = st.file_uploader("Choose a file")
-#platform_mass = st.number_input("Give the platfrom mass:")
-#@st.cache(allow_output_mutation=True)
-#@st.experimental_singleton
-@st.cache  # No need for TTL this time. It's static data :)
 def get_data():
     if uploaded_file:
         df_raw_data = pd.read_csv(uploaded_file, sep='\s+', skiprows=3, index_col = None)
@@ -80,10 +74,7 @@ if uploaded_file:
     df_raw_data= get_data()
     st.dataframe(df_raw_data, use_container_width=True)
 
-    # if st.button('Reload Dataframe with Raw Data'):
-    #     get_data()
     if df_raw_data is not None:
-        #df_prepared = df_raw_data.copy()
         min_time = int(df_raw_data['Time'].min()) 
         max_time = int(df_raw_data['Time'].max())
         
@@ -94,7 +85,6 @@ if uploaded_file:
                 from_time = st.number_input("Give the first time")
             with col2:
                 till_time = st.number_input("Give the second time")
-            
             
             selected_time_range = st.slider('Select the whole time range of the graph, per 1000', min_time, max_time, (min_time, max_time), 1)
             selected_area = (df_raw_data.Time.between(selected_time_range[0], selected_time_range[1]) )
@@ -113,11 +103,6 @@ if uploaded_file:
                 df_prepared['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
                 df_prepared = pd.DataFrame(df_prepared[selected_area])
             
-            
-        
-
-    # col1, col2 = st.columns(2, gap='large')
-    # with col1:
     ### CHART A ###
     if submitted:
         fig_trigger = px.line(df_prepared, x="Time", y="Trigger")
@@ -177,7 +162,6 @@ if uploaded_file:
 
     if submitted :
 
-        # To Drop the unnecessary Columns
         #df_prepared.drop(['Time'], axis = 1, inplace=True)
         filename = uploaded_file.name
         # To Get only the filename without extension (.txt)
