@@ -154,7 +154,6 @@ def get_data():
 
 if url_list:
     df = get_data()
-    st.write(len(df.index))
     st.dataframe(df, use_container_width=True)
     min_time = int(df.index.min())
     max_time = int(df.index.max())
@@ -194,17 +193,16 @@ if url_list:
 
     st.write("#")
     st.subheader("Details about this trial:")
-    col1,col2,col3,col4,col5 = st.columns(5, gap="small")
+    col1,col2,col3,col4 = st.columns(4, gap="small")
     with col1:
         st.write("**Instructor:**", url_list[0]['instructor'])
     with col2:
         st.write("**Fullname:**", url_list[0]['fullname'])
     with col3:
-        st.write("**Weight:**", url_list[0]['weight'])
-    with col4:
         st.write("**Type of the trial:**", url_list[0]['kind_of_trial'])
-    with col5:
+    with col4:
         st.write("**Date:**", url_list[0]['created_at'])
+                
     st.write("---")
 
     col1,col2 = st.columns([3,1],gap='large')
