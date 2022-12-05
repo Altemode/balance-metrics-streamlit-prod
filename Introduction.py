@@ -19,7 +19,7 @@ st.set_page_config(
 
 
 
-st.title("Welcome to the Balance Data Analysis App.")
+st.title("Welcome to the Balance Data Analysis App")
 st.subheader("In cooperation with the School of Physical Education and Sports Science of Athens.")
 st.write("#")
 st.sidebar.info("Select a page above.")

@@ -154,6 +154,7 @@ def get_data():
 
 if url_list:
     df = get_data()
+    st.write(len(df.index))
     st.dataframe(df, use_container_width=True)
     min_time = int(df.index.min())
     max_time = int(df.index.max())
