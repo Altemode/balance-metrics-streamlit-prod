@@ -154,7 +154,8 @@ def get_data():
 
 if url_list:
     df = get_data()
-    st.dataframe(df, use_container_width=True)
+    
+    
     min_time = int(df.index.min())
     max_time = int(df.index.max())
     min_ML = min(df['ML'])
@@ -173,7 +174,7 @@ if url_list:
         #fig1.layout.xaxis.title = 'Dates'
 
         fig1.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
-                        marker_symbol = 'circle', name="ML/AP Point", marker_color='red',
+                        marker_symbol = 'circle', name="ML/AP Point", marker_color='blue',
                         marker_size = 5))
         fig1.add_trace(go.Scatter(x=[0], y=[0], mode = 'markers',
                         marker_symbol = 'circle', name="Zero Point", marker_color='red',
@@ -192,7 +193,7 @@ if url_list:
     fig1 = make_charts()
 
     st.write("#")
-    st.subheader("Details about this trial:")
+    st.info("**Details about this trial:**", icon="ℹ️")
     col1,col2,col3,col4 = st.columns(4, gap="small")
     with col1:
         st.write("**Instructor:**", url_list[0]['instructor'])
@@ -207,11 +208,13 @@ if url_list:
 
     col1,col2 = st.columns([3,1],gap='large')
     with col1:
-        st.markdown("**Xn | Yn Chart** (in cm)")
+        st.write("**Xn | Yn Chart** (in cm)")
         st.plotly_chart(fig1,use_container_width=True)
     with col2:
         st.write("#")
-        st.markdown('**Results** (in cm) ')
+        st.write("#")
+        st.write('**Results** (in cm) ')
+        #st.write("#")
         st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
         st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
         st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
@@ -222,7 +225,7 @@ if url_list:
 
     st.write("#")
     selected_clear_columns = st.multiselect(
-    label='What column do you want to display', default=('Time','Xn', 'Yn','Rn'), help='Click to select', options=df.columns)
+    label='Choose columns to be displayed', default=('Time', 'ML', 'AP', 'Xn', 'Yn','Rn'), help='Click to select', options=df.columns)
     st.dataframe(df[selected_clear_columns], use_container_width=True)
     st.download_button(
         label="Export Table",
