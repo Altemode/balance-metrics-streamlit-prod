@@ -41,7 +41,7 @@ with st.sidebar.expander("Download a sample file:"):
         file_name='sample.csv',
         mime='text/csv',
     )
-# Method to delete a entry from den database:
+#-----Method to delete a entry from den database:-----#
 with st.sidebar.expander("DELETE USER", expanded=False):
     st.error("Warning this is pernament")
     with st.form("delete user"):
@@ -62,12 +62,13 @@ with st.sidebar.expander("DELETE USER", expanded=False):
             st.success('Thank you! This entry has been deleted from database!')
         else:
             st.warning("There is no entry with this id to delete!")
+#-----End of Method to delete a entry from den database:-----#
 
 
 # Main title of the page:
 st.title("Calculate Results")
 
-# Fetch and display the whole table with entries:
+#--------Fetch and display the whole table with entries:--------#
 url_list=[]
 with st.expander("List of all entries from the database.", expanded=True):
     st.caption("Use the below search fields to filter the datatable!")
@@ -113,6 +114,7 @@ with st.expander("List of all entries from the database.", expanded=True):
         
     else:
         st.write("There are no entries in the database! Please insert first!")
+#--------End of Fetch and display the whole table with entries:---------#
 
 # Method to run results:
 with st.sidebar.form("Type the ID of your link:", clear_on_submit=False):   
@@ -130,32 +132,20 @@ with st.sidebar.form("Type the ID of your link:", clear_on_submit=False):
         if url_list:
             url = url_list[0]['filepath'].replace(" ", "%20")
             st.write("Person ID:", url_list[0]['id'])
+            st.write("Person Filepath:",url_list[0]['filepath'])
         else:
             st.write("There is no entry with this ID")
 
-#@st.cache(allow_output_mutation=True)
 def get_data():
     if url_list:
         storage_options = {'User-Agent': 'Mozilla/5.0'}
         df = pd.read_csv(url_list[0]['filepath'].replace(" ", "%20"), storage_options=storage_options)
-        W = 450
-        L = 450
-        df['ML'] =  (W / 2) * (( df['Mass_2'] + df['Mass_3'] - df['Mass_1'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] )
-        df['AP'] =  (L / 2) * (( df['Mass_2'] + df['Mass_1'] - df['Mass_3'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] ) 
-        
         df['Rows_Count'] = df.index
-        N = len(df)
-
-        df['Xn'] = df['ML'] - ( 1 / N ) * df['ML'].sum()
-
-        df['Yn'] = df['AP'] - ( 1 / N ) * df['AP'].sum()
-
     return df
 
 if url_list:
+    
     df = get_data()
-    
-    
     min_time = int(df.index.min())
     max_time = int(df.index.max())
     min_ML = min(df['ML'])
@@ -166,34 +156,33 @@ if url_list:
 
     df['Rn'] = ( (df['Xn'] ** 2) + (df['Yn'] ** 2) ) ** (1/2)
    
-    #@st.cache  # No need for TTL this time. It's static data :)
     def make_charts():       
         fig1 = px.scatter(df, x="Xn", y="Yn", opacity= 0.4)
         fig1.update_traces(marker={'size': 1})
-        #fig1.layout.xaxis.color = 'red'
-        #fig1.layout.xaxis.title = 'Dates'
-
+        #Create marker point
         fig1.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
                         marker_symbol = 'circle', name="ML/AP Point", marker_color='blue',
                         marker_size = 5))
-        fig1.add_trace(go.Scatter(x=[0], y=[0], mode = 'markers',
+        #Create marker point
+        fig1.add_trace(go.Scatter(x=[round(df['Xn'].mean(),3)], y=[round(df['Yn'].mean(),3)], mode = 'markers',
                         marker_symbol = 'circle', name="Zero Point", marker_color='red',
                         marker_size = 5))
         fig1.update_layout(
-            # yaxis=dict(
-            #     range=[-8, 8]
-            # ),
-            # xaxis=dict(
-            #     range=[-8, 8]
-            # ),
              margin=dict(l=10, r=10, t=10, b=60),
         )        
         return fig1
 
     fig1 = make_charts()
-
     st.write("#")
     st.info("**Details about this trial:**", icon="ℹ️")
+    col1,col2,col3 = st.columns(3, gap='medium')
+    with col1:
+        st.caption("X & Y Columns have been created by CoPx & CoPy Plux equations, in whole time range.")
+    with col2:
+        st.caption("ML & AP Columns have been created by X & Y Columns minus the means values of X, Y (Xp, Yp) between two triggers.")
+    with col3:
+        st.caption("Xn & Yn Columns have been created by ML & AP Columns minus the means values of ML, AP between two triggers.")
+
     col1,col2,col3,col4 = st.columns(4, gap="small")
     with col1:
         st.write("**Instructor:**", url_list[0]['instructor'])
@@ -218,14 +207,17 @@ if url_list:
         st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
         st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
         st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
+        st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
         st.write('Mean Rn', round(df['Rn'].mean(),3))
         st.write('Max Rn',  round(max(df['Rn']),3))
         st.write('Min Rn',  round(min(df['Rn']),3))
 
 
     st.write("#")
+    st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
+    st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
     selected_clear_columns = st.multiselect(
-    label='Choose columns to be displayed', default=('Time', 'ML', 'AP', 'Xn', 'Yn','Rn'), help='Click to select', options=df.columns)
+    label='Choose columns to be displayed', default=('Time', 'X', 'Y', 'ML', 'AP', 'Xn', 'Yn','Rn'), help='Click to select', options=df.columns)
     st.dataframe(df[selected_clear_columns], use_container_width=True)
     st.download_button(
         label="Export Table",

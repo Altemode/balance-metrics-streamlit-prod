@@ -33,78 +33,123 @@ with st.expander("Show File Form", expanded=True):
     uploaded_file = st.file_uploader("Choose a file")
 def get_data():
     if uploaded_file:
-        df_raw_data = pd.read_csv(uploaded_file, sep='\s+', skiprows=3, index_col = None)
+        df = pd.read_csv(uploaded_file, sep='\s+', skiprows=3, index_col = None)
         #Define Header columns
-        columns_count = len(df_raw_data.axes[1])
+        columns_count = len(df.axes[1])
         if columns_count == 6:
-            df_raw_data.columns = ['Time', 'Trigger', 'Mass_1', 'Mass_2', 'Mass_3', 'Mass_4']
+            df.columns = ['Time', 'Trigger', 'Mass_1', 'Mass_2', 'Mass_3', 'Mass_4']
         
         C = 406.831
         #sr = 1000
         resolution = 16
         # Calculate for A Sensor Mass $ Weight
         Vfs_1 = 2.00016
-        df_raw_data['Mass_1'] = df_raw_data['Mass_1'] * C / (Vfs_1 * ( (2**resolution) - 1 ) )
+        df['Mass_1'] = df['Mass_1'] * C / (Vfs_1 * ( (2**resolution) - 1 ) )
         # Calculate for B Sensor Mass $ Weight
         Vfs_2 = 2.00002
-        df_raw_data['Mass_2'] = df_raw_data['Mass_2'] * C / (Vfs_2 * ( (2**resolution) - 1 ) )
+        df['Mass_2'] = df['Mass_2'] * C / (Vfs_2 * ( (2**resolution) - 1 ) )
         # Calculate for C Sensor Mass $ Weight
         Vfs_3 = 2.00057
-        df_raw_data['Mass_3'] = df_raw_data['Mass_3'] * C / (Vfs_3 * ( (2**resolution) - 1 ) )
+        df['Mass_3'] = df['Mass_3'] * C / (Vfs_3 * ( (2**resolution) - 1 ) )
         # Calculate for D Sensor Mass $ Weight
         Vfs_4 = 2.00024
-        df_raw_data['Mass_4'] = df_raw_data['Mass_4'] * C / (Vfs_4 * ( (2**resolution) - 1 ) )
+        df['Mass_4'] = df['Mass_4'] * C / (Vfs_4 * ( (2**resolution) - 1 ) )
         # Calculate the sum of all sensors Mass $ Weight
-        df_raw_data['Mass_Sum'] = (df_raw_data['Mass_1'] + df_raw_data['Mass_2'] + df_raw_data['Mass_3'] + df_raw_data['Mass_4'])
-        df_raw_data['Rows_Count'] = df_raw_data.index
+        df['Mass_Sum'] = (df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'])
 
-        mean_weight_A = df_raw_data.loc[0:500, 'Mass_1'].mean()
-        mean_weight_B = df_raw_data.loc[0:500, 'Mass_2'].mean()
-        mean_weight_C = df_raw_data.loc[0:500, 'Mass_3'].mean()
-        mean_weight_D = df_raw_data.loc[0:500, 'Mass_4'].mean()
-        df_raw_data['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
-        df_raw_data['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
-        df_raw_data['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
-        df_raw_data['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
+        # Find the CoPX, CoPY for whole time range:
+        W = 450
+        L = 450
+        df['X'] =  (W / 2) * (( df['Mass_2'] + df['Mass_3'] - df['Mass_1'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] )
+        df['Y'] =  (L / 2) * (( df['Mass_2'] + df['Mass_1'] - df['Mass_3'] - df['Mass_4'] )) / ( df['Mass_1'] + df['Mass_2'] + df['Mass_3'] + df['Mass_4'] ) 
+        
+        df['Rows_Count'] = df.index
 
-        return df_raw_data
+        # Find for each sensor the platform mass and subtract it
+        mean_weight_A = df.loc[0:500, 'Mass_1'].mean()
+        mean_weight_B = df.loc[0:500, 'Mass_2'].mean()
+        mean_weight_C = df.loc[0:500, 'Mass_3'].mean()
+        mean_weight_D = df.loc[0:500, 'Mass_4'].mean()
+        df['Mass_1'] = df['Mass_1'] - mean_weight_A
+        df['Mass_2'] = df['Mass_2'] - mean_weight_B
+        df['Mass_3'] = df['Mass_3'] - mean_weight_C
+        df['Mass_4'] = df['Mass_4'] - mean_weight_D
+
+        return df
 
 if uploaded_file:
     
-    df_raw_data= get_data()
-    st.dataframe(df_raw_data, use_container_width=True)
+    df= get_data()
+    st.dataframe(df, use_container_width=True)
 
-    if df_raw_data is not None:
-        min_time = int(df_raw_data['Time'].min()) 
-        max_time = int(df_raw_data['Time'].max())
+    if df is not None:
+        min_time = int(df['Time'].min()) 
+        max_time = int(df['Time'].max())
+        st.write("#")
         
-        with st.form("Give the numbers"):
-            col1,col2 = st.columns(2)
-            st.write("Give duration")
+        with st.form("Give the times in stable state to find the means in X & Y columns"):
+            st.markdown("Give the times in Balance & Trial period.")
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                from_time = st.number_input("Give the first time")
+                from_balance_time = st.number_input("From Balance Time", step=1)
             with col2:
-                till_time = st.number_input("Give the second time")
-            
-            selected_time_range = st.slider('Select the whole time range of the graph, per 1000', min_time, max_time, (min_time, max_time), 1)
-            selected_area = (df_raw_data.Time.between(selected_time_range[0], selected_time_range[1]) )
+                till_balance_time = st.number_input("Till Balance Time", step=1)
+            with col3:
+                from_trial_time = st.number_input("From Trial Time", step=1)
+            with col4:
+                till_trial_time = st.number_input("Till Trial Time", step=1)
+            st.write("#")
+            selected_time_range = st.slider('Choose the Trial Time Period, between Triggers. This will be your final dataset.', min_time, max_time, (min_time, max_time), 1)
+            selected_area = (df.Time.between(selected_time_range[0], selected_time_range[1]) )
 
             submitted = st.form_submit_button("Calculate")
-
+            
             if submitted :
-                mean_weight_A = df_raw_data.loc[from_time:till_time, 'Mass_1'].mean()
-                mean_weight_B = df_raw_data.loc[from_time:till_time, 'Mass_2'].mean()
-                mean_weight_C = df_raw_data.loc[from_time:till_time, 'Mass_3'].mean()
-                mean_weight_D = df_raw_data.loc[from_time:till_time, 'Mass_4'].mean()
-                df_prepared = df_raw_data.copy()
-                df_prepared['Mass_1'] = df_raw_data['Mass_1'] - mean_weight_A
-                df_prepared['Mass_2'] = df_raw_data['Mass_2'] - mean_weight_B
-                df_prepared['Mass_3'] = df_raw_data['Mass_3'] - mean_weight_C
-                df_prepared['Mass_4'] = df_raw_data['Mass_4'] - mean_weight_D
-                df_prepared = pd.DataFrame(df_prepared[selected_area])
+                #----Before Trigger----#
+                #Find the means of stable state:
+                Xp = df.loc[int(from_balance_time):int(till_balance_time), 'X'].mean()
+                Yp = df.loc[int(from_balance_time):int(till_balance_time), 'Y'].mean()
+                
+
+                #----After Trigger----#
+                #Find the ML, AP:
+                df['ML'] = df['X'] - Xp
+                df['AP'] = df['Y'] - Yp
+                if selected_time_range[0]>1000:
+                    
+                    ML_mean = df.loc[int(from_trial_time):int(till_trial_time), 'ML'].mean()
+                    AP_mean = df.loc[int(from_trial_time):int(till_trial_time), 'AP'].mean()
+                    st.write("MPIKA",ML_mean)
+                    #Find the Xn, Yn:
+                    df['Xn'] = df['ML'] - ML_mean       
+                    df['Yn'] = df['AP'] - AP_mean
+                    st.write("df")
+                    st.dataframe(df, use_container_width=True)
+                    df_prepared = df.copy()
+                    st.write("df_[prepared")
+                    st.dataframe(df_prepared, use_container_width=True)
+                    df_prepared = pd.DataFrame(df_prepared[selected_area])
+                    st.write("EDWW")
+                    st.write(ML_mean, df_prepared['Xn'].mean())
+                    st.dataframe(df_prepared, use_container_width=True)
+                    
             
     ### CHART A ###
     if submitted:
+
+        # st.write(df_prepared['ML'].mean())
+        # K = len(df_prepared)
+        # st.write(( 1 / K ) * df_prepared['ML'].sum())
+        # st.write(df['ML'].mean())
+        # st.write('Mean ML & AP:', round(df_prepared['ML'].mean(),3),'&', round(df_prepared['AP'].mean(),3))
+        # st.write('Mean Xn & Yn:', round(df_prepared['Xn'].mean(),3),'&', round(df_prepared['Yn'].mean(),3))
+        #st.dataframe(df, use_container_width=True)
+        st.write("2o if submitted")
+        st.write("df")
+        st.dataframe(df, use_container_width=True)
+        st.write("df_[prepared")
+        st.write("MPIKA",ML_mean)
+        st.dataframe(df_prepared, use_container_width=True)
         fig_trigger = px.line(df_prepared, x="Time", y="Trigger")
         fig_trigger.update_layout(
                         margin=dict(l=0, r=20, t=0, b=60),
@@ -119,12 +164,12 @@ if uploaded_file:
         st.plotly_chart(fig_trigger, use_container_width=True)
 
     else:
-        fig_trigger = px.line(df_raw_data, x="Time", y="Trigger")
+        fig_trigger = px.line(df, x="Time", y="Trigger")
         fig_trigger.update_layout(
                         margin=dict(l=0, r=20, t=0, b=60),
                         #paper_bgcolor="LightSteelBlue",   
                     )
-        fig1 = px.line(df_raw_data, x="Time", y="Mass_1", title='Sensor A')
+        fig1 = px.line(df, x="Time", y="Mass_1", title='Sensor A')
         fig1.update_layout(
                         margin=dict(l=0, r=20, t=30, b=0),
                         #paper_bgcolor="LightSteelBlue",   
@@ -139,7 +184,7 @@ if uploaded_file:
     #         st.plotly_chart(fig3, use_container_width=True)
 
     #     else:
-    #         fig3 = px.line(df_raw_data, x="Time", y="Mass_3", title='Sensor C')
+    #         fig3 = px.line(df, x="Time", y="Mass_3", title='Sensor C')
     #         st.plotly_chart(fig3, use_container_width=True)            
         
     # with col2:
@@ -148,7 +193,7 @@ if uploaded_file:
     #         fig2 = px.line(df_prepared, x="Time", y="Mass_2", title='Sensor B')
     #         st.plotly_chart(fig2, use_container_width=True)
     #     else:
-    #         fig2 = px.line(df_raw_data, x="Time", y="Mass_2", title='Sensor B')
+    #         fig2 = px.line(df, x="Time", y="Mass_2", title='Sensor B')
     #         st.plotly_chart(fig2, use_container_width=True) 
 
 
@@ -157,7 +202,7 @@ if uploaded_file:
     #         fig4 = px.line(df_prepared, x="Time", y="Mass_4", title='Sensor D')
     #         st.plotly_chart(fig2, use_container_width=True)
     #     else:
-    #         fig4 = px.line(df_raw_data, x="Time", y="Mass_4", title='Sensor D')
+    #         fig4 = px.line(df, x="Time", y="Mass_4", title='Sensor D')
     #         st.plotly_chart(fig4, use_container_width=True)
 
     if submitted :
