@@ -212,8 +212,19 @@ if url_list:
         st.write('Maximal distance |Rn|:',  round(max(df['Rn'].abs()),3))
         st.write('Root mean square ML:', round(((df['Xn'] ** 2).mean()) ** (1/2),3))
         st.write('Root mean square radius:', round(((df['Rn'] ** 2).mean()) ** (1/2),3))
-
-
+        st.write('RANGE ML |Xn - Xm|:',  round(np.fabs(df['Xn'].max() - df['Xn'].min()),3))
+        st.write('RANGE AP |Yn - Ym|:',  round(np.fabs(df['Yn'].max() - df['Yn'].min()),3))
+        st.write('RANGE ML-AP:', round(((df['Xn'].max() - df['Xn'].min()) ** (1/2) + (df['Yn'].max() - df['Yn'].min()) ** (1/2)) ** (1/2),3))
+        st.write('RANGE RATIO:', round(np.fabs(df['Xn'].max() - df['Xn'].min()) / np.fabs(df['Yn'].max() - df['Yn'].min()),3))
+        
+        N = len(df)
+        rms_ml = ((1/N) * ((df['Xn']) ** 2).sum()) ** (1/2)
+        rms_ap = ((1/N) * ((df['Yn']) ** 2).sum()) ** (1/2)
+        cov = ( 1 / N ) * (df['Xn'] * df['Yn']).sum()
+        st.write(cov, N)
+        p = 3.14
+        conf_area = 2 * p * ( len(df) - 1 ) / ( len(df) - 2 ) * (((rms_ml) ** (2) * (rms_ap) ** 2) - (cov) ** 2) ** (1/2)
+        st.write('conf',conf_area)
 
         st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
         
