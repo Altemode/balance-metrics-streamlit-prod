@@ -157,7 +157,7 @@ if url_list:
     df['Rn'] = ( (df['Xn'] ** 2) + (df['Yn'] ** 2) ) ** (1/2)
    
     def make_charts():       
-        fig1 = px.scatter(df, x="Xn", y="Yn", opacity= 0.4)
+        fig1 = px.scatter(df, x="ML", y="AP", opacity= 0.4)
         fig1.update_traces(marker={'size': 1})
         #Create marker point
         fig1.add_trace(go.Scatter(x=[round(df['ML'].mean(),3)], y=[round(df['AP'].mean(),3)], mode = 'markers',
@@ -204,16 +204,31 @@ if url_list:
         st.write("#")
         st.write('**Results** (in cm) ')
         #st.write("#")
-        st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
-        st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
-        st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
-        st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
-        st.write('Mean Rn', round(df['Rn'].mean(),3))
-        st.write('Max Rn',  round(max(df['Rn']),3))
-        st.write('Min Rn',  round(min(df['Rn']),3))
+        #st.write('Min & Max ML:', round(min(df['ML']),3),'&', round(max(df['ML']),3))
+        #st.write('Min & Max AP:', round(min(df['AP']),3),'&', round(max(df['AP']),3))
+        st.write('ML Mean distance |ML|:', round(df['ML'].abs().mean(),3))
+        st.write('Mean distance |Rn|:', round(df['Rn'].abs().mean(),3))
+        st.write('Maximal distance |ML|:', round(max(df['ML'].abs()),3))
+        st.write('Maximal distance |Rn|:',  round(max(df['Rn'].abs()),3))
+        st.write('Root mean square ML:', round(((df['Xn'] ** 2).mean()) ** (1/2),3))
+        st.write('Root mean square radius:', round(((df['Rn'] ** 2).mean()) ** (1/2),3))
 
+
+
+        st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
+        
+        st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
+        
+        
+        #st.write('Min Rn',  round(min(df['Rn']),3))
+
+        #MEAN DIST. ML Mean distance ML 1
 
     st.write("#")
+    df['MLabs'] = df['ML'].abs()
+
+    st.write(df['MLabs'].mean())
+    
     st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
     st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))
     selected_clear_columns = st.multiselect(
