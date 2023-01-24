@@ -146,10 +146,11 @@ def get_data():
 if url_list:
     
     df = get_data()
+    st.write(df)
     min_time = int(df.index.min())
     max_time = int(df.index.max())
-    min_ML = min(df['ML'])
-    max_ML = max(df['ML'])
+    #min_ML = min(df['ML'])
+    #max_ML = max(df['ML'])
     selected_time_range = st.sidebar.slider('Select the time range, per 100', min_time, max_time, (min_time, max_time), 100)
     df_selected_model = (df.Rows_Count.between(selected_time_range[0], selected_time_range[1]) )
     df = pd.DataFrame(df[df_selected_model])
@@ -197,7 +198,7 @@ if url_list:
 
     col1,col2 = st.columns([3,1],gap='large')
     with col1:
-        st.write("**Xn | Yn Chart** (in cm)")
+        st.write("**ML | AP Chart** (in cm)")
         st.plotly_chart(fig1,use_container_width=True)
     with col2:
         st.write("#")
@@ -221,11 +222,9 @@ if url_list:
         rms_ml = ((1/N) * ((df['Xn']) ** 2).sum()) ** (1/2)
         rms_ap = ((1/N) * ((df['Yn']) ** 2).sum()) ** (1/2)
         cov = ( 1 / N ) * (df['Xn'] * df['Yn']).sum()
-        st.write(cov, N)
+        
         p = 3.14
         conf_area = 2 * p * ( len(df) - 1 ) / ( len(df) - 2 ) * (((rms_ml) ** (2) * (rms_ap) ** 2) - (cov) ** 2) ** (1/2)
-        st.write('conf',conf_area)
-
         st.write('Mean ML & AP:', round(df['ML'].mean(),3),'&', round(df['AP'].mean(),3))
         
         st.write('Mean Xn & Yn:', round(df['Xn'].mean(),3),'&', round(df['Yn'].mean(),3))

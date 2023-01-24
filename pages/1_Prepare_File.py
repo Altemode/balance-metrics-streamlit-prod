@@ -60,7 +60,7 @@ def get_data():
         mean_weight_B = df.loc[0:500, 'Mass_2'].mean()
         mean_weight_C = df.loc[0:500, 'Mass_3'].mean()
         mean_weight_D = df.loc[0:500, 'Mass_4'].mean()
-        st.write(mean_weight_A,mean_weight_B,mean_weight_C,mean_weight_D)
+        #st.write(mean_weight_A,mean_weight_B,mean_weight_C,mean_weight_D)
         df['Mass_1'] = df['Mass_1'] - mean_weight_A
         df['Mass_2'] = df['Mass_2'] - mean_weight_B
         df['Mass_3'] = df['Mass_3'] - mean_weight_C
@@ -79,12 +79,12 @@ def get_data():
 if uploaded_file:
     
     df= get_data()
-    df
+    
     if df is not None:
         min_time = int(df.index.min()) 
         max_time = int(df.index.max())
-        st.write(min_time)
-        st.write("#")
+        #st.write(min_time)
+        #st.write("#")
         
         with st.form("Give the times in stable state to find the means in X & Y columns"):
             st.markdown("Give the times in Balance & Trial period.")
@@ -114,7 +114,7 @@ if uploaded_file:
                 df['ML'] = df['X'] - Xp
                 df['AP'] = df['Y'] - Yp
                 #if selected_time_range[0]>1000:
-                st.write(df['ML'].mean())
+                #st.write(df['ML'].mean())
                     
                 ML_mean = df.loc[int(from_trial_time):int(till_trial_time), 'ML'].mean()
                 
@@ -124,14 +124,15 @@ if uploaded_file:
                 df['Yn'] = df['AP'] - AP_mean
                 #df_prepared = df.copy()
                 df_prepared = pd.DataFrame(df[selected_area])
-                st.write(ML_mean, df_prepared.loc[int(from_trial_time):int(till_trial_time), 'ML'].mean(), df_prepared['ML'].mean())
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write(df_prepared.loc[int(from_trial_time):int(till_trial_time), 'ML'])
-    with col2: 
-        st.write(df_prepared[['Time','ML']])
+                #st.write(ML_mean, df_prepared.loc[int(from_trial_time):int(till_trial_time), 'ML'].mean(), df_prepared['ML'].mean())
+    
     ### CHART A ###
     if submitted:
+        # col1, col2 = st.columns(2)
+        # with col1:
+        #     st.write(df_prepared.loc[int(from_trial_time):int(till_trial_time), 'ML'])
+        # with col2: 
+        #     st.write(df_prepared[['Time','ML']])
         # Chart for Mass
         fig_mass = px.line(df_prepared, x="Time", y="Mass_Sum", title='Mass Sum', height=350)
         fig_mass.update_layout(
@@ -170,7 +171,7 @@ if uploaded_file:
         filename = uploaded_file.name
         # To Get only the filename without extension (.txt)
         final_filename = os.path.splitext(filename)[0]
-        st.write(df_prepared['ML'].mean(),ML_mean)
+        #st.write(df_prepared['ML'].mean(),ML_mean)
         st.write("The file name of your file is : ", final_filename)
         show_df_prepared = st.checkbox("Display the final dataframe")
         st.dataframe(df_prepared)
