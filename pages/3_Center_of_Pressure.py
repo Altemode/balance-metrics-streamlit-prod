@@ -146,7 +146,6 @@ def get_data():
 if url_list:
     
     df = get_data()
-    st.write(df)
     min_time = int(df.index.min())
     max_time = int(df.index.max())
     #min_ML = min(df['ML'])
